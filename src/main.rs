@@ -1,20 +1,21 @@
 #![allow(unused)]
-use rand::prelude::*;
-use rand::distributions::{Alphanumeric, Uniform, Standard};
-
+use base64::{engine::general_purpose, Engine as _};
 use clap::Parser;
-use greprf::errors::Error;
+use greprf::clap::OutputFormat;
 use greprf::clap::{Cli, Commands};
 use greprf::clap::{GenerateCommands, GenerateSecretCommands};
+use greprf::errors::Error;
 use greprf::sutf8::UString;
-
+use rand::distributions::{Alphanumeric, Standard, Uniform};
+use rand::prelude::*;
+use std::io;
+use std::io::Write;
 
 const ASCII_PRINTABLE: &'static str = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
 const ASCII_LETTERS: &'static str = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const ASCII_DIGITS: &'static str = "0123456789";
-const ASCII_ALPHANUM: &'static str = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-
-
+const ASCII_ALPHANUM: &'static str =
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
 fn main() -> Result<(), Error> {
     let cli = Cli::parse();
@@ -31,16 +32,18 @@ fn main() -> Result<(), Error> {
                         result.push(pool[c % pool.len()]);
                     }
                     println!("{}", String::from_utf8_lossy(&result));
-                },
+                }
                 GenerateSecretCommands::U8(params) => {
                     let mut result = String::new();
-                    let secret = (&mut rng).sample_iter(Standard).take(params.length)
+                    let secret = (&mut rng)
+                        .sample_iter(Standard)
+                        .take(params.length)
                         .collect::<Vec<u8>>();
                     let ussr = UString::new(&secret);
                     println!("{}", ussr.soft_word());
                     println!("{}", ussr.ascii());
                     println!("{}", hex::encode(ussr.garbage()));
-                },
+                }
 
                 GenerateSecretCommands::Ab(params) => {
                     let mut result = Vec::<u8>::new();
@@ -50,7 +53,7 @@ fn main() -> Result<(), Error> {
                         result.push(pool[c % pool.len()]);
                     }
                     println!("{}", String::from_utf8_lossy(&result));
-                },
+                }
                 GenerateSecretCommands::Al(params) => {
                     let mut result = Vec::<u8>::new();
                     for c in 0..params.length {
@@ -59,7 +62,7 @@ fn main() -> Result<(), Error> {
                         result.push(pool[c % pool.len()]);
                     }
                     println!("{}", String::from_utf8_lossy(&result));
-                },
+                }
                 GenerateSecretCommands::Nu(params) => {
                     let mut result = Vec::<u8>::new();
                     for c in 0..params.length {
@@ -68,9 +71,27 @@ fn main() -> Result<(), Error> {
                         result.push(pool[c % pool.len()]);
                     }
                     println!("{}", String::from_utf8_lossy(&result));
-                },
+                }
+                GenerateSecretCommands::B(params) => {
+                    let mut result = Vec::<u8>::new();
+                    for c in 0..params.length {
+                        let b: u8 = rng.gen(); // generates a float between 0 and 1
+                        result.push(b);
+                    }
+                    let mut stdout = io::stdout().lock();
+                    stdout.write_all(&match params.format {
+                        OutputFormat::Raw => result,
+                        OutputFormat::Hex => hex::encode(result).as_bytes().to_vec(),
+                        OutputFormat::Base64 => {
+                            general_purpose::STANDARD_NO_PAD.encode(result).as_bytes().to_vec()
+                        }
+                    })?;
+                    if params.linebreak {
+                        println!("");
+                    }
+                }
             },
-        }
+        },
     }
     Ok(())
 }

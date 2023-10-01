@@ -13,7 +13,7 @@ exclude = ["tests", "docs"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-base64 = "0.21.4"
+base64 = { version = "0.21.4", features = ["alloc"] }
 clap = { version = "4.4.6", features = ["derive", "unicode", "env", "wrap_help", "string"] }
 hex = { version = "0.4.3", features = ["serde"] }
 md5 = "0.7.0"
