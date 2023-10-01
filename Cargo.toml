@@ -2,7 +2,7 @@
 name = "greprf"
 version = "0.1.0"
 edition = "2021"
-license = "GPL-3.0-or-later"
+license = "Unlicense"
 authors = ["Đ4ⱱ1ƝƇᎩ <d4v1ncy@protonmail.ch>"]
 description = "secret generation"
 documentation = "https://docs.rs/greprf"
@@ -16,15 +16,11 @@ exclude = ["tests", "docs"]
 base64 = { version = "0.21.4", features = ["alloc"] }
 clap = { version = "4.4.6", features = ["derive", "unicode", "env", "wrap_help", "string"] }
 hex = { version = "0.4.3", features = ["serde"] }
-md5 = "0.7.0"
 rand = "0.8.5"
-regex = { version = "1.9.6", features = ["use_std", "pattern", "logging"] }
-rot13 = "0.1.1"
 serde = { version = "1.0.188", features = ["rc", "derive", "alloc", "serde_derive"] }
-serde_json = { version = "1.0.107", features = ["indexmap", "float_roundtrip", "alloc", "preserve_order", "raw_value", "unbounded_depth", "arbitrary_precision"] }
-serde_yaml = "0.9.25"
+regex = { version = "1.9.6", features = ["use_std", "pattern", "logging"] }
 sha3 = { version = "0.10.8", features = ["reset", "asm", "oid"] }
-shellexpand = "3.1.0"
+
 
 [lib]
 name = "greprf"

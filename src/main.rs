@@ -1,12 +1,10 @@
-#![allow(unused)]
 use base64::{engine::general_purpose, Engine as _};
 use clap::Parser;
 use greprf::clap::OutputFormat;
 use greprf::clap::{Cli, Commands};
 use greprf::clap::{GenerateCommands, GenerateSecretCommands};
-use greprf::errors::Error;
 use greprf::sutf8::UString;
-use rand::distributions::{Alphanumeric, Standard, Uniform};
+use rand::distributions::{Standard};
 use rand::prelude::*;
 use std::io;
 use std::io::Write;
@@ -17,7 +15,7 @@ const ASCII_DIGITS: &'static str = "0123456789";
 const ASCII_ALPHANUM: &'static str =
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
-fn main() -> Result<(), Error> {
+fn main() -> Result<(), std::io::Error> {
     let cli = Cli::parse();
     let mut rng = thread_rng();
 
@@ -34,7 +32,6 @@ fn main() -> Result<(), Error> {
                     println!("{}", String::from_utf8_lossy(&result));
                 }
                 GenerateSecretCommands::U8(params) => {
-                    let mut result = String::new();
                     let secret = (&mut rng)
                         .sample_iter(Standard)
                         .take(params.length)
@@ -74,7 +71,7 @@ fn main() -> Result<(), Error> {
                 }
                 GenerateSecretCommands::B(params) => {
                     let mut result = Vec::<u8>::new();
-                    for c in 0..params.length {
+                    for _ in 0..params.length {
                         let b: u8 = rng.gen(); // generates a float between 0 and 1
                         result.push(b);
                     }
